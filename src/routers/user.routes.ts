@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import * as controller from "../controllers/user.controller";
+import { authMiddleware } from "../middelwares/authMiddleware";
+import { managerOnly } from "../middelwares/roleMiddleware";
 
 const userRouter = Router();
 
@@ -28,5 +30,20 @@ userRouter.post(
   ],
   controller.login
 );
+
+
+userRouter.get(
+  '/:id',
+  authMiddleware,
+  controller.getUserById
+);
+
+userRouter.get(
+  '/employees',
+  authMiddleware,
+  managerOnly,
+  controller.getAllEmployees
+);
+
 
 export default userRouter;

@@ -43,3 +43,29 @@ export const login = async (
     next(err);
   }
 };
+
+
+export const getUserById = async (req: Request, res: Response<AuthResponse>, next: NextFunction):Promise<void> => {
+  try {
+    const userId = req.params.id;
+
+    const user = await userModel.findById(userId).select('name email');
+    if (!user) {
+     res.status(404).json({ error: { message: 'User not found' } });
+    }
+
+    res.json({ data: user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+export const getAllEmployees = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const employees = await userModel.find({ role: 'Employee' }).select('name email');
+    res.json({ data: employees });
+  } catch (err) {
+    next(err);
+  }
+};

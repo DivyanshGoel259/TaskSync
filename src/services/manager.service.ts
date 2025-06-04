@@ -35,3 +35,42 @@ export const createTask = async ({
     throw err;
   }
 };
+
+export const updateTask = async (
+  taskId: string,
+  data: any,
+  managerId: string
+) => {
+  try {
+    const task = await taskModel.findOne({ _id: taskId, createdBy: managerId });
+    if (!task) throw new Error("Task not found or unauthorized");
+
+    Object.assign(task, data, { updatedAt: new Date() });
+    await task.save();
+    return task;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const deleteTask = async (taskId: string, managerId: string) => {
+  try {
+    const task = await taskModel.findOneAndDelete({
+      _id: taskId,
+      createdBy: managerId,
+    });
+    if (!task) throw new Error("Task not found or unauthorized");
+    return task;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getTasksCreatedByManager = async (managerId: string) => {
+  try {
+    const tasks = await taskModel.find({ createdBy: managerId });
+    return tasks;
+  } catch (err) {
+    throw err;
+  }
+};
