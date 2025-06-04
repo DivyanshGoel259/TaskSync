@@ -1,3 +1,4 @@
+import { notifyManager } from "../lib/utils";
 import { taskModel } from "../models/task.model";
 
 enum status {
@@ -32,6 +33,12 @@ export const updateTaskStatusByEmployee = async (
     task.status = status;
     task.updatedAt = new Date();
     await task.save();
+
+    notifyManager(task.createdBy.toString(), {
+      message: "Task status updated by employee",
+      taskId,
+      status,
+    });
 
     return task;
   } catch (err) {

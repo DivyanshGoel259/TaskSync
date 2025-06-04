@@ -1,3 +1,4 @@
+import { notifyAssignedUser } from "../lib/utils";
 import { taskModel } from "../models/task.model";
 
 interface TaskInput {
@@ -30,6 +31,12 @@ export const createTask = async ({
       updatedAt: new Date(),
     });
 
+    await newTask.save();
+    notifyAssignedUser(assignedTo, {
+      message: "You have a new task assigned",
+      task: newTask,
+    });
+
     return newTask;
   } catch (err) {
     throw err;
@@ -47,6 +54,7 @@ export const updateTask = async (
 
     Object.assign(task, data, { updatedAt: new Date() });
     await task.save();
+
     return task;
   } catch (err) {
     throw err;
