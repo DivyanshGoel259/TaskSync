@@ -1,5 +1,4 @@
 import { onlineUsers } from "../index";
-import { io } from "../index";
 
 // Notify assigned employee
 export const notifyAssignedUser = (userId: string, data: any) => {
