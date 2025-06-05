@@ -5,19 +5,19 @@ import userRouter from "./routers/user.routes";
 import { DbConnect } from "./lib/db";
 import managerRouter from "./routers/manager.routes";
 import employeeRouter from "./routers/employee.routes";
-import { verify } from "jsonwebtoken";
 import http from "http";
 import { Server } from "socket.io";
+import { verify } from "jsonwebtoken";
 
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const PORT = process.env.PORT ;
-const SOCKET_PORT = process.env.SOCKET_PORT;
 
 const app = express();
 
 DbConnect();
+
+const PORT = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
@@ -26,29 +26,9 @@ app.use("/api/v1/auth", userRouter);
 app.use("/api/v1/manager", managerRouter);
 app.use("/api/v1/employee", employeeRouter);
 
-// Express error handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  res.status(400).json({
-    error: {
-      message: err.message || "something went wrong",
-    },
-  });
-});
+const server = http.createServer(app);
 
-app.get("/", (req: Request, res: Response) => {
-  res.json("Connection Established");
-});
-
-app.listen(PORT, () => {
-  console.log(` Express server running on port ${PORT}`);
-});
-
-
-const socketApp = express(); 
-
-const socketServer = http.createServer(socketApp);
-
-export const io = new Server(socketServer, {
+export const io = new Server(server, {
   cors: {
     origin: "*",
     credentials: true,
@@ -58,8 +38,9 @@ export const io = new Server(socketServer, {
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   try {
-    if (!JWT_SECRET) throw new Error("Please Provide Valid Secret Key");
-
+    if (!JWT_SECRET) {
+      throw new Error("Please Provide Valid Secret Key");
+    }
     const decoded: any = verify(token, JWT_SECRET);
     (socket as any).userId = decoded._id;
     next();
@@ -77,16 +58,24 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     onlineUsers.delete(userId);
-    console.log(` User disconnected: ${userId}`);
+    console.log(`User disconnected: ${userId}`);
   });
 });
 
-socketApp.get("/", (_, res) => {
-  res.send("Socket server running");
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  res.status(400).json({
+    error: {
+      message: err.message || "something went wrong",
+    },
+  });
 });
 
-socketServer.listen(SOCKET_PORT, () => {
-  console.log(` Socket.IO server running on port ${SOCKET_PORT}`);
+app.get("/", (req: Request, res: Response) => {
+  res.json("Connection Established");
 });
 
-export { socketServer, onlineUsers };
+app.listen(PORT, () => {
+  console.log("Server running on port" + PORT);
+});
+
+export { server, onlineUsers };
