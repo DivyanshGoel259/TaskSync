@@ -9,7 +9,7 @@ const employeeRouter = Router();
 employeeRouter.get("/my-tasks", authMiddleware, controller.getEmployeeTasks);
 
 // Employee updates status of a task
-employeeRouter.patch(
+employeeRouter.put(
   "/:taskId/status",
   authMiddleware,
   [

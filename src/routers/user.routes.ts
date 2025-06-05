@@ -33,17 +33,20 @@ userRouter.post(
 
 
 userRouter.get(
-  '/:id',
-  authMiddleware,
-  controller.getUserById
-);
-
-userRouter.get(
   '/employees',
   authMiddleware,
   managerOnly,
   controller.getAllEmployees
 );
+
+
+userRouter.get(
+  '/:id',
+  authMiddleware,
+  controller.getUserById
+);
+
+
 
 
 export default userRouter;
