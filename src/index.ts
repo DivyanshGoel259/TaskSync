@@ -36,8 +36,9 @@ export const io = new Server(server, {
 });
 
 io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
+  const fullToken = socket.handshake.auth.token;
   try {
+    const token = fullToken.split(" ")[1]
     if (!JWT_SECRET) {
       throw new Error("Please Provide Valid Secret Key");
     }
