@@ -74,8 +74,12 @@ app.get("/", (req: Request, res: Response) => {
   res.json("Connection Established");
 });
 
-app.listen(PORT, () => {
+
+
+server.listen(PORT, () => {
   console.log("Server running on port" + PORT);
 });
+
+
 
 export { server, onlineUsers };
